@@ -22,6 +22,8 @@ jobs:
           TAG_NAME: ${{ github.ref }}
           GH_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
         run: |
+          set -x
+          set -e
           source ~/.config/envman/PATH.env
           TAG_NAME=$(echo $TAG_NAME | sed 's/refs\/tags\///')
           RELEASE_ID=$(gh api /repos/$PRIVATE_REPO/releases/tags/$TAG_NAME | jq -r '.id')
