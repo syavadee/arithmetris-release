@@ -21,7 +21,7 @@ jobs:
           PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
           TAG_NAME: ${{ github.ref }}
           GH_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
-          PRIVATE_REPO: "${{ env.PRIVATE_REPO }}"
+          PRIVATE_REPO: "syavadee/arithmetris"
         run: |
           set -x
           set -e
@@ -52,7 +52,7 @@ jobs:
           PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
           RELEASE_ID: ${{ env.RELEASE_ID }}
           GH_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
-          PRIVATE_REPO: "${{ env.PRIVATE_REPO }}"
+          PRIVATE_REPO: "syavadee/arithmetris"
         run: |
           source ~/.config/envman/PATH.env
           ASSETS=$(gh api -H "Authorization: token $PRIVATE_REPO_TOKEN" /repos/$PRIVATE_REPO/releases/$RELEASE_ID/assets | jq -r '.[].browser_download_url')
