@@ -15,7 +15,7 @@ jobs:
       - name: Get release info from private repo
         env:
           PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
-          PRIVATE_REPO: your-username/your-private-repo
+          PRIVATE_REPO: syavadee/arithmetris
           TAG_NAME: ${{ github.ref }}
         run: |
           TAG_NAME=$(echo $TAG_NAME | sed 's/refs\/tags\///')
