@@ -32,7 +32,7 @@ jobs:
 
       - name: Create release in public repo
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
           RELEASE_NAME: ${{ env.RELEASE_NAME }}
           RELEASE_BODY: ${{ env.RELEASE_BODY }}
           TAG_NAME: ${{ github.ref }}
@@ -46,7 +46,7 @@ jobs:
         env:
           PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
           RELEASE_ID: ${{ env.RELEASE_ID }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
         run: |
           source ~/.config/envman/PATH.env
           #set -x
