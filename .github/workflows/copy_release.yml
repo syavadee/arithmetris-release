@@ -1,0 +1,61 @@
+name: Copy Release
+
+on:
+  push:
+    tags:
+      - 'v*' # или любой другой паттерн для ваших тегов
+
+jobs:
+  copy_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get release info from private repo
+        env:
+          PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          PRIVATE_REPO: your-username/your-private-repo
+          TAG_NAME: ${{ github.ref }}
+        run: |
+          TAG_NAME=$(echo $TAG_NAME | sed 's/refs\/tags\///')
+          RELEASE_ID=$(curl -s -H "Authorization: token $PRIVATE_REPO_TOKEN" "https://api.github.com/repos/$PRIVATE_REPO/releases/tags/$TAG_NAME" | jq -r '.id')
+          RELEASE_NAME=$(curl -s -H "Authorization: token $PRIVATE_REPO_TOKEN" "https://api.github.com/repos/$PRIVATE_REPO/releases/$RELEASE_ID" | jq -r '.name')
+          RELEASE_BODY=$(curl -s -H "Authorization: token $PRIVATE_REPO_TOKEN" "https://api.github.com/repos/$PRIVATE_REPO/releases/$RELEASE_ID" | jq -r '.body')
+          echo "RELEASE_ID=$RELEASE_ID" >> $GITHUB_ENV
+          echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
+          echo "RELEASE_BODY=$RELEASE_BODY" >> $GITHUB_ENV
+
+      - name: Create release in public repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NAME: ${{ env.RELEASE_NAME }}
+          RELEASE_BODY: ${{ env.RELEASE_BODY }}
+          TAG_NAME: ${{ github.ref }}
+        run: |
+          TAG_NAME=$(echo $TAG_NAME | sed 's/refs\/tags\///')
+          curl -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" "https://api.github.com/repos/${{ github.repository }}/releases" -d '{
+            "tag_name": "'$TAG_NAME'",
+            "name": "'$RELEASE_NAME'",
+            "body": "'$RELEASE_BODY'"
+          }'
+          RELEASE_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG_NAME" | jq -r '.id')
+          echo "PUBLIC_RELEASE_ID=$RELEASE_ID" >> $GITHUB_ENV
+
+      - name: Upload APK assets from private release
+        env:
+          PRIVATE_REPO_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          PRIVATE_REPO: your-username/your-private-repo
+          RELEASE_ID: ${{ env.RELEASE_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLIC_RELEASE_ID: ${{ env.PUBLIC_RELEASE_ID }}
+        run: |
+          ASSETS=$(curl -s -H "Authorization: token $PRIVATE_REPO_TOKEN" "https://api.github.com/repos/$PRIVATE_REPO/releases/$RELEASE_ID/assets" | jq -r '.[].browser_download_url')
+          for ASSET_URL in $ASSETS; do
+            ASSET_NAME=$(echo $ASSET_URL | sed -E 's/.*\/(.*)/\1/')
+            if [[ "$ASSET_NAME" == *.apk ]]; then # Проверяем, что это APK файл
+              curl -H "Authorization: token $PRIVATE_REPO_TOKEN" -L "$ASSET_URL" > "$ASSET_NAME"
+              curl -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/octet-stream" "https://uploads.github.com/repos/${{ github.repository }}/releases/$PUBLIC_RELEASE_ID/assets?name=$ASSET_NAME" --data-binary @"$ASSET_NAME"
+              rm "$ASSET_NAME"
+            fi
+          done
