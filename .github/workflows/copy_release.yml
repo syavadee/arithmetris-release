@@ -25,6 +25,7 @@ jobs:
           echo "RELEASE_ID=$RELEASE_ID" >> $GITHUB_ENV
           echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
           echo "RELEASE_BODY=$RELEASE_BODY" >> $GITHUB_ENV
+          cat $GITHUB_ENV
 
       - name: Create release in public repo
         env:
@@ -46,6 +47,7 @@ jobs:
           }'
           RELEASE_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG_NAME" | jq -r '.id')
           echo "PUBLIC_RELEASE_ID=$RELEASE_ID" >> $GITHUB_ENV
+          cat $GITHUB_ENV
 
       - name: Upload APK assets from private release
         env:
