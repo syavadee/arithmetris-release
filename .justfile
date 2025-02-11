@@ -29,3 +29,5 @@ newtag := `git tag -l |tail -n1 |python3 -c "print('v' + '.'.join(map(str,(lambd
     gh api /repos/$PRIVATE_REPO/releases/tags/$TAG_NAME | jq -r '.id'    
     gh api /repos/$PRIVATE_REPO/releases/tags/$TAG_NAME | jq -r '.assets[].url'
     gh api /repos/$PRIVATE_REPO/releases/tags/$TAG_NAME | jq -r '.assets[].name'
+@del:
+    gh release delete v1.0.7
