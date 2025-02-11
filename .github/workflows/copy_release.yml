@@ -58,7 +58,7 @@ jobs:
           ASSET_URL=$(gh  api -H "Authorization: token $PRIVATE_REPO_TOKEN" /repos/$PRIVATE_REPO/releases/tags/$TAG_NAME | jq -r '.assets[].url')
           ASSET_NAME=$(gh api -H "Authorization: token $PRIVATE_REPO_TOKEN" /repos/$PRIVATE_REPO/releases/tags/$TAG_NAME | jq -r '.assets[].name')
           echo "$ASSET_URL" "$ASSET_NAME"
-          curl -H "X-GitHub-Api-Version: 2022-11-28" -H "Accept: application/octet-stream" -L "$ASSET_URL" > "$ASSET_NAME"
+          curl -s -H "Authorization: token $PRIVATE_REPO_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" -H "Accept: application/octet-stream" -L "$ASSET_URL" > "$ASSET_NAME"
           ls -la
           gh release upload $TAG_NAME "$ASSET_NAME" --clobber
           rm "$ASSET_NAME"
