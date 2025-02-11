@@ -60,6 +60,7 @@ jobs:
             ASSET_NAME=$(echo $ASSET_URL | sed -E 's/.*\/(.*)/\1/')
             if [[ "$ASSET_NAME" == *.apk ]]; then
               curl -H "Authorization: token $PRIVATE_REPO_TOKEN" -L "$ASSET_URL" > "$ASSET_NAME"
+              ls -la
               gh release upload $TAG_NAME "$ASSET_NAME" --clobber
               rm "$ASSET_NAME"
             fi
