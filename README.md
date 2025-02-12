@@ -1,1 +1,1 @@
-# arithmetris-release 1.0.7
+# arithmetris-release v1.0.12

@@ -1,18 +1,17 @@
 @help:
     just --summary
 set dotenv-load := true
-tag := `git tag -l |tail -n1`
-newtag := `git tag -l |tail -n1 |python3 -c "print('v' + '.'.join(map(str,(lambda lst: lst[:-1] + [(lst[-1]+1)])(list(map(int,input()[1:].split('.')))))))"`
-@tag:
-    echo {{ tag }}
-    git tag --delete {{ tag }} || true
-    git push --delete origin {{ tag }} || true
-    git tag {{ tag }}
+#tag := `git tag -l |tail -n1`
+#newtag := `git tag -l |tail -n1 |python3 -c "print('v' + '.'.join(map(str,(lambda lst: lst[:-1] + [(lst[-1]+1)])(list(map(int,input()[1:].split('.')))))))"`
+@tag arg:
+    echo {{ arg }}
+    echo "# arithmetris-release {{ arg }}" > README.md
+    git commit -am'release version {{ arg }}'
+    git tag --delete {{ arg }} || true
+    git push --delete origin {{ arg }} || true
+    git tag {{ arg }}
     git push
     git push --tags
-
-@newtag:
-    echo {{ newtag }}
 
 @test:
     echo v1.0.7 | python3 -c "print('v' + '.'.join(map(str,(lambda lst: lst[:-1] + [(lst[-1]+1)])(list(map(int,input()[1:].split('.')))))))"
