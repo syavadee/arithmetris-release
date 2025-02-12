@@ -7,8 +7,8 @@ set dotenv-load := true
     echo {{ arg }}
     echo "# arithmetris-release {{ arg }}" > README.md
     git commit -am'release version {{ arg }}'
-    git tag --delete {{ arg }} || true
-    git push --delete origin {{ arg }} || true
+    git tag -d $(git tag -l) || true
+    git push --delete origin git tag -d $(git tag -l) || true
     git tag {{ arg }}
     git push
     git push --tags
